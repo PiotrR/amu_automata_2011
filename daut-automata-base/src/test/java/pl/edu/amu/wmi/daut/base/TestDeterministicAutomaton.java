@@ -307,6 +307,43 @@ public class TestDeterministicAutomaton extends TestCase {
 
         assertEquals(spec.countStates(), 2);
     }
-
+    /**
+     * Test na automacie akceptującym język skladajacy sie z 0 i 1,
+     * gdzie liczba zer jest podzielna przez 5.
+     */
+    public final void testAutomatonAcceptingFiveZeros() {
+        DeterministicAutomatonSpecification spec =
+                        new NaiveDeterministicAutomatonSpecification();
+        State q0 = spec.addState();
+        State q1 = spec.addState();
+        State q2 = spec.addState();
+        State q3 = spec.addState();
+        State q4 = spec.addState();
+        State q5 = spec.addState();
+        
+        spec.addLoop(q0, new CharTransitionLabel('1'));
+        spec.addTransition(q0, q1, new CharTransitionLabel('0'));
+        spec.addTransition(q1, q2, new CharTransitionLabel('0'));
+        spec.addTransition(q2, q3, new CharTransitionLabel('0'));
+        spec.addTransition(q3, q4, new CharTransitionLabel('0'));
+        spec.addTransition(q4, q5, new CharTransitionLabel('0'));
+        spec.addTransition(q5, q2, new CharTransitionLabel('0'));
+        spec.addLoop(q5, new CharTransitionLabel('1'));
+        spec.addTransition(q1, q0, new CharTransitionLabel('1'));
+        spec.addTransition(q2, q0, new CharTransitionLabel('1'));
+        spec.addTransition(q3, q0, new CharTransitionLabel('1'));
+        spec.addTransition(q4, q0, new CharTransitionLabel('1'));
+        
+        spec.markAsInitial(q0);
+        spec.markAsFinal(q5);
+        
+        AutomatonByRecursion automaton = new AutomatonByRecursion(spec);
+        assertTrue(automaton.accepts("100000"));
+        assertTrue(automaton.accepts("000001"));
+        assertFalse(automaton.accepts("00011101011111000"));
+        assertFalse(automaton.accepts(""));
+        assertFalse(automaton.accepts("bdaasrweewrgsdf"));
+        assertFalse(automaton.accepts("$@%%@#$@#!@"));
+    }
 
 }
